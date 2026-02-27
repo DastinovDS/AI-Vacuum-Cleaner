@@ -1,0 +1,4 @@
+.idea/
+.venv/
+q_table.npy
+__pycache__/
