@@ -70,14 +70,16 @@ class SmartVacuumEnv:
         self.steps_since_last_dock = 0
         self.cleaned_since_last_dock = 0
 
-        # Anti-loop / anti-stalling shaping (prevents ABAB ping-pong and "hang around forever")
+        # Anti-loop / anti-stalling shaping (prevents ABAB ping-pong and
+        # "hang around forever")
         self.recent_positions = []
         self.recent_positions_maxlen = 4  # detect ABAB loops
         # Small penalty just to break ties; too large will dominate learning
         self.loop_abab_penalty = -25.0
         self.steps_since_last_successful_clean = 0
         self.no_clean_penalty_start = 40  # steps without successful cleaning
-        self.no_clean_step_penalty = -2.0  # applied per-step after start while dirt remains
+        self.no_clean_step_penalty = -2.0  # applied per-step after
+        # start while dirt remains
         # Penalty for walking away from a dirty tile without cleaning it
         self.leave_dirty_penalty = 10.0
 
@@ -101,12 +103,14 @@ class SmartVacuumEnv:
         self.steps_since_last_successful_clean = 0
 
         # Create dirt grid
-        self.dirt_grid = np.zeros((self.grid_size, self.grid_size), dtype=np.int8)
+        self.dirt_grid = np.zeros((self.grid_size, self.grid_size),
+                                  dtype=np.int8)
         num_tiles = self.grid_size * self.grid_size
         num_dirt = int(num_tiles * self.dirt_density)
 
         # Choose random dirt positions (can include base; that's fine)
-        all_positions = [(x, y) for x in range(self.grid_size) for y in range(self.grid_size)]
+        all_positions = [(x, y) for x in range(self.grid_size)
+                         for y in range(self.grid_size)]
         dirt_positions = self.rng.sample(all_positions, num_dirt)
         for (x, y) in dirt_positions:
             self.dirt_grid[y, x] = 1
@@ -122,7 +126,8 @@ class SmartVacuumEnv:
         """
         Processes the agent's action and updates the environment's state.
 
-        This is the core logic engine. It calculates movement, wall collisions,
+        This is the core logic engine. It calculates movement,
+        wall collisions,
         cleaning success, and battery consumption. It also computes a
         multi-faceted reward including:
         - Survival bonuses for docking with low battery.
@@ -132,7 +137,8 @@ class SmartVacuumEnv:
 
         :param action: The action index (0:N, 1:S, 2:W, 3:E, 4:Clean).
 
-        :return: tuple - (next_state: int, reward: float, done: bool, info: dict)
+        :return: tuple - (next_state: int, reward: float,
+        done: bool, info: dict)
         """
         self.step_count += 1
         self.steps_since_last_dock += 1
@@ -142,7 +148,8 @@ class SmartVacuumEnv:
         reward = 0.0
         done = False
 
-        # Track global dirt count and whether we are currently on dirt before the step
+        # Track global dirt count and whether we
+        # are currently on dirt before the step
         prev_remaining = int(np.sum(self.dirt_grid))
         was_dirt_here = self.dirt_grid[y, x] == 1
 
@@ -165,7 +172,8 @@ class SmartVacuumEnv:
             self._apply_energy_cost(self.move_cost)
 
             # Wall check
-            if not (0 <= new_x < self.grid_size and 0 <= new_y < self.grid_size):
+            if not (0 <= new_x < self.grid_size and
+                    0 <= new_y < self.grid_size):
                 # Hit wall -> stay in place + penalty
                 reward += self.reward_hit_wall
                 # Also treat as idle movement penalty
@@ -176,7 +184,8 @@ class SmartVacuumEnv:
                 # Idle movement penalty
                 reward += self.reward_idle_move
 
-                # If we left a dirty tile without cleaning it, discourage that behavior
+                # If we left a dirty tile without cleaning it,
+                # discourage that behavior
                 if was_dirt_here:
                     reward -= self.leave_dirty_penalty
 
@@ -190,7 +199,8 @@ class SmartVacuumEnv:
                 self.cleaned_since_last_dock += 1
                 self.steps_since_last_successful_clean = 0
 
-                # Extra bonus if this tile is far from the base (encourage exploring)
+                # Extra bonus if this tile is far from the
+                # base (encourage exploring)
                 bx, by = self.base_pos
                 dist_from_base = abs(x - bx) + abs(y - by)
                 if dist_from_base >= self.far_clean_distance_threshold:
@@ -201,7 +211,8 @@ class SmartVacuumEnv:
         else:
             raise ValueError(f"Invalid action: {action}")
 
-        # Track recent positions and penalize ABAB ping-pong loops (including base in/out)
+        # Track recent positions and penalize ABAB ping-pong loops
+        # (including base in/out)
         self.recent_positions.append(self.agent_pos)
         if len(self.recent_positions) > self.recent_positions_maxlen:
             self.recent_positions.pop(0)
@@ -220,8 +231,10 @@ class SmartVacuumEnv:
                 self.battery = self.max_battery
 
                 # Give a strong "mission accomplished" / survival bonus
-                if battery_pct_before < 30.0 and self.cleaned_since_last_dock > 0:
-                    survival_bonus = 400.0 + (self.cleaned_since_last_dock * 20.0)
+                if (battery_pct_before < 30.0 and
+                        self.cleaned_since_last_dock > 0):
+                    survival_bonus = (400.0 +
+                                      (self.cleaned_since_last_dock * 20.0))
                     reward += survival_bonus
                 else:
                     # Discourage abusive docking loops without doing work
@@ -249,10 +262,13 @@ class SmartVacuumEnv:
             reward += 50.0 * cleaned_this_step
 
         if new_remaining > 0:
-            # Small time pressure while dirt remains (kept small to avoid swamping learning)
+            # Small time pressure while dirt remains
+            # (kept small to avoid swamping learning)
             reward -= 0.15
-            # If we've been wandering too long without cleaning, apply stronger pressure
-            if self.steps_since_last_successful_clean >= self.no_clean_penalty_start:
+            # If we've been wandering too long without cleaning,
+            # apply stronger pressure
+            if (self.steps_since_last_successful_clean >=
+                    self.no_clean_penalty_start):
                 reward += self.no_clean_step_penalty
 
         # Check if all dirt cleaned
@@ -280,23 +296,28 @@ class SmartVacuumEnv:
 
     def _get_state(self):
         """
-        Compresses the high-dimensional grid state into a single integer [0..255].
+        Compresses the high-dimensional grid state into a
+        single integer [0..255].
 
-        The encoding uses a hierarchical bit-packing (or index-offset) approach
-        to ensure the Q-agent can generalize its knowledge. The components are:
+        The encoding uses a hierarchical bit-packing
+        (or index-offset) approach
+        to ensure the Q-agent can generalize its knowledge.
+        The components are:
         1. Direction Sector (8): Compass direction to base (if low battery)
            or nearest dirt (if high battery).
         2. Distance to Base (3): Far, Mid, or Near bins.
         3. Battery Level (4): Critical, Low, Mid, or High bins.
         4. Dirt Under Feet (2): Binary flag.
-        5. Proximity Dirt (2): Binary flag if dirt is in a 3x3 surrounding area.
+        5. Proximity Dirt (2): Binary flag if dirt is in a
+        3x3 surrounding area.
 
         :return: int - A discrete state index between 0 and 255.
         """
 
         x, y = self.agent_pos
 
-        # Direction to nearest dirt (if any). If no dirt exists, default offset 0.
+        # Direction to nearest dirt (if any).
+        # If no dirt exists, default offset 0.
         nearest_dx, nearest_dy = 0, 0
         found_dirt = False
         min_dist = None
@@ -312,7 +333,8 @@ class SmartVacuumEnv:
 
         # Battery level bins and target focus (dirt vs base)
         battery_pct = (self.battery / self.max_battery) * 100.0
-        # 4 battery bins: 0: Critical (<15), 1: Low (15-40), 2: Mid (40-75), 3: High (>75)
+        # 4 battery bins: 0: Critical (<15), 1: Low (15-40),
+        # 2: Mid (40-75), 3: High (>75)
         if battery_pct < 15.0:
             battery_bin = 0
         elif battery_pct < 40.0:
@@ -322,7 +344,8 @@ class SmartVacuumEnv:
         else:
             battery_bin = 3
 
-        # Target direction: focus on base when battery is low/critical, dirt otherwise
+        # Target direction: focus on base when battery is low/critical,
+        # dirt otherwise
         if battery_pct < 30.0:
             target_dx, target_dy = -x, -y  # base at (0,0)
         else:
@@ -357,7 +380,8 @@ class SmartVacuumEnv:
                 break
 
         # Encode into single integer
-        # order: sector (8) * distance (3) * battery (4) * dirt_here (2) * proximity (2)
+        # order: sector (8) * distance (3) * battery (4) *
+        # dirt_here (2) * proximity (2)
         idx = sector
         idx = idx * 3 + distance_bin
         idx = idx * 4 + battery_bin

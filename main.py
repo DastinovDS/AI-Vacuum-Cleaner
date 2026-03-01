@@ -13,12 +13,14 @@ def main():
     Orchestrates the Smart Vacuum Reinforcement Learning pipeline.
 
     The execution flow follows these steps:
-    1.  Initialization: Instantiates the SmartVacuumEnv and QAgent with default configurations.
+    1.  Initialization: Instantiates the SmartVacuumEnv and QAgent
+    with default configurations.
     2.  Model Persistence: Checks for a local 'q_table.npy' file.
         - If found: Loads the pre-trained weights into the agent.
-        - If not: Triggers a full training session (30,000 episodes) and saves the resulting
-            Q-table to disk.
-    3.  Evaluation: Runs a series of greedy episodes to print performance metrics
+        - If not: Triggers a full training session (30,000 episodes)
+        and saves the resulting Q-table to disk.
+    3.  Evaluation: Runs a series of greedy episodes
+        to print performance metrics
         (Average Reward, Steps, and Remaining Dirt) to the console.
     4.  Visualization: Launches the interactive Pygame dashboard to watch the
         agent navigate the environment in real-time using its learned policy.
@@ -33,7 +35,8 @@ def main():
         print(f"Loaded existing Q-table from {q_path.name}.")
     else:
         print("Training started...")
-        train_agent(env, agent, num_episodes=30000, max_steps_per_episode=1000, log_interval=1000)
+        train_agent(env, agent, num_episodes=30000,
+                    max_steps_per_episode=1000, log_interval=1000)
         np.save(q_path, agent.Q)
         print(f"Training finished and Q-table saved to {q_path.name}.")
 

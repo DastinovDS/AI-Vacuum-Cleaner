@@ -9,20 +9,26 @@ def train_agent(
     log_interval: int = 1000,
 ):
     """
-    Executes the Q-Learning training process over a specified number of episodes.
+    Executes the Q-Learning training process over a specified
+    number of episodes.
 
-    This function facilitates the interaction between the agent and the environment,
-    allowing the agent to learn a policy by updating its Q-table based on rewards
-    received. It handles epsilon-greedy exploration decay and provides periodic
+    This function facilitates the interaction between the agent
+    and the environment,
+    allowing the agent to learn a policy by updating its Q-table
+    based on rewards received. It handles epsilon-greedy
+    exploration decay and provides periodic
     logging of performance metrics.
 
     :param env: The reinforcement learning environment.
     :param agent: The agent to be trained.
     :param num_episodes: Total number of training episodes to run.
-    :param max_steps_per_episode: Hard limit on steps per episode to prevent infinite loops.
-    :param log_interval: How often (in episodes) to print the average reward to the console.
+    :param max_steps_per_episode: Hard limit on steps per
+                    episode to prevent infinite loops.
+    :param log_interval: How often (in episodes) to print
+                    the average reward to the console.
 
-    :return: list[float] - A history of total rewards earned in each episode, useful for
+    :return: list[float] - A history of total rewards earned
+                    in each episode, useful for
                     plotting the learning curve.
     """
     rewards_history = []
@@ -58,11 +64,15 @@ def train_agent(
 
 def evaluate_policy(env, agent, episodes: int = 20):
     """
-    Evaluates the performance of the trained agent using a purely greedy policy.
+    Evaluates the performance of the trained agent
+    using a purely greedy policy.
 
-    By setting epsilon to 0.0, this function tests the 'final' learned knowledge
-    of the agent without any random exploration. It collects statistics over multiple
-    episodes to determine the reliability and efficiency of the vacuum's strategy.
+    By setting epsilon to 0.0, this function tests the
+    'final' learned knowledge
+    of the agent without any random exploration. It collects
+    statistics over multiple
+    episodes to determine the reliability and efficiency
+    of the vacuum's strategy.
 
     Metrics printed:
     - Average Reward: Overall success and penalty avoidance.

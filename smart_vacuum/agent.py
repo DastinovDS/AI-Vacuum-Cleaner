@@ -27,21 +27,26 @@ class QAgentConfig:
 
 class QAgent:
     """
-    A reinforcement learning agent using the Q-Learning (Temporal Difference) algorithm.
+    A reinforcement learning agent using the Q-Learning
+    (Temporal Difference) algorithm.
 
-    This agent maintains a Q-table to estimate the expected future rewards for every
-    state-action pair. It uses an epsilon-greedy strategy to balance exploration
+    This agent maintains a Q-table to estimate the expected
+    future rewards for every
+    state-action pair. It uses an epsilon-greedy
+    strategy to balance exploration
     of the environment with exploitation of its learned knowledge.
     """
     def __init__(self, config: QAgentConfig):
         self.config = config
-        self.Q = np.zeros((config.num_states, config.num_actions), dtype=np.float32)
+        self.Q = np.zeros((config.num_states, config.num_actions),
+                          dtype=np.float32)
 
     def get_epsilon(self, episode_index: int) -> float:
         """
         Calculates the current exploration rate (epsilon) using linear decay.
 
-        As training progresses, the likelihood of taking random actions decreases,
+        As training progresses, the likelihood of taking
+        random actions decreases,
         allowing the agent to rely more on its learned Q-values.
 
         :param episode_index: The index of the current training episode.
@@ -56,11 +61,14 @@ class QAgent:
 
     def select_action(self, state: int, epsilon: float) -> int:
         """
-        Chooses an action based on the epsilon-greedy policy for a given state.
+        Chooses an action based on the epsilon-greedy
+        policy for a given state.
 
-        With probability epsilon, the agent explores (chooses a random action).
+        With probability epsilon, the agent explores
+        (chooses a random action).
         Otherwise, it exploits (chooses the action with the highest Q-value).
-        If multiple actions share the same maximum Q-value, one is chosen at random
+        If multiple actions share the same maximum Q-value,
+        one is chosen at random
         to prevent deterministic loops.
 
         :param state: The current encoded state index.
@@ -71,19 +79,22 @@ class QAgent:
         if np.random.rand() < epsilon:
             return int(np.random.randint(0, self.config.num_actions))
 
-        # Greedy action with random tie-breaking (prevents deterministic loops)
+        # Greedy action with random tie-breaking
+        # (prevents deterministic loops)
         row = self.Q[state]
         max_q = float(np.max(row))
         best_actions = np.flatnonzero(row == max_q)
         return int(np.random.choice(best_actions))
 
-    def update(self, state: int, action: int, reward: float, next_state: int, done: bool):
+    def update(self, state: int, action: int, reward: float,
+               next_state: int, done: bool):
         """
         Updates the Q-table entry using the Bellman Equation (TD Learning).
 
         This function calculates the Temporal Difference (TD) target and error
-        to adjust the Q-value for the state-action pair just executed. It incorporates
-        the immediate reward and the discounted maximum future reward of the next state.
+        to adjust the Q-value for the state-action pair just executed.
+        It incorporates the immediate reward and the discounted maximum
+        future reward of the next state.
 
         :param state: The current state index.
         :param action: The action performed in state s.
