@@ -45,11 +45,11 @@ def visualize_policy(env, agent, fps: int = 10):
     TEXT_MAIN = (240, 240, 240)
     TEXT_DIM = (160, 160, 160)
 
-    ACTION_NAMES = {0: "NORTH ↑", 1: "SOUTH ↓", 2: "WEST ←",
-                    3: "EAST →", 4: "CLEANING ⚡"}
+    ACTION_NAMES = {0: "NORTH", 1: "SOUTH", 2: "WEST",
+                    3: "EAST", 4: "CLEANING"}
 
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption("Smart Vacuum | Time-Travel Debugger")
+    pygame.display.set_caption("Smart Vacuum")
     clock = pygame.time.Clock()
 
     font_main = pygame.font.SysFont("Inter, Segoe UI, Roboto", 24,
