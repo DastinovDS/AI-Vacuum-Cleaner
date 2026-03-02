@@ -101,7 +101,7 @@ def evaluate_policy(env, agent, episodes: int = 20):
     avg_steps = sum(s[1] for s in stats) / episodes
     avg_remaining = sum(s[2] for s in stats) / episodes
     print(
-        f"Eval (greedy): avg_reward={avg_reward:.1f}, "
+        f"Evaluation (greedy): avg_reward={avg_reward:.1f}, "
         f"avg_steps={avg_steps:.1f}, "
         f"avg_remaining_dirt={avg_remaining:.2f}"
     )

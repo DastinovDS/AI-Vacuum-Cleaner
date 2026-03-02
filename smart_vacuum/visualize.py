@@ -189,8 +189,8 @@ def visualize_policy(env, agent, fps: int = 10):
         y = HEIGHT - 110
         hotkeys = [
             ("[SPACE] Play/Pause", TEXT_MAIN),
-            ("[→] Step Forward", ACCENT_GREEN),
-            ("[←] Step Back (Undo)", ACCENT_RED),
+            ("[->] Step Forward", ACCENT_GREEN),
+            ("[<-] Step Back (Undo)", ACCENT_RED),
             ("[R] Restart", TEXT_DIM)
         ]
         for txt, color in hotkeys:
